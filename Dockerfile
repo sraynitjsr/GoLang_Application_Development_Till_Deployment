@@ -1,9 +1,8 @@
-FROM golang:1.19-latest
+FROM golang:1.19
 
 WORKDIR /app
 
 COPY go.mod ./
-
 RUN go mod download
 
 COPY *.go ./
