@@ -1,39 +1,61 @@
 package main
 
 import (
-	"fmt"
-	"log"
+	"encoding/json"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
-func formHandler(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		fmt.Fprintln(w, "Error while Parsing the form", err)
-	}
-	name := r.FormValue("name")
-	hobbies := r.FormValue("hobbies")
-	fmt.Fprintln(w, name, "has hobbies", hobbies)
+type Employee struct {
+	Name string `json:"name"`
+	Id   int    `json:"id"`
 }
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, "Wrong HTTP Method", http.StatusNotAcceptable)
+var employees []Employee = []Employee{
+	{
+		Name: "A",
+		Id:   10,
+	},
+	{
+		Name: "B",
+		Id:   20,
+	},
+}
+
+func homePage(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Welcome to the Employee API"))
+}
+
+func getEmployee(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["name"]
+	id, _ := strconv.ParseInt(vars["id"], 10, 64)
+	emp := Employee{
+		Name: name,
+		Id:   int(id),
 	}
-	fmt.Fprintln(w, "Hello World")
+
+	flag := false
+
+	for _, e := range employees {
+		if e.Name == emp.Name && e.Id == emp.Id {
+			flag = true
+			break
+		}
+	}
+
+	if flag {
+		json.NewEncoder(w).Encode(emp)
+	} else {
+		w.Write([]byte("No Such Employee Exists"))
+	}
 }
 
 func main() {
-	fileServer := http.FileServer(http.Dir(""))
-
-	http.Handle("/", fileServer)
-
-	http.HandleFunc("/form", formHandler)
-
-	http.HandleFunc("/hello", helloHandler)
-
-	fmt.Println("Starting Server at 8080")
-
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal(err)
-	}
+	router := mux.NewRouter()
+	router.HandleFunc("/", homePage)
+	router.HandleFunc("/employee/{name}/{id}", getEmployee)
+	http.ListenAndServe(":8080", router)
 }
