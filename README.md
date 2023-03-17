@@ -7,3 +7,6 @@
 
 ## For Installing the Chart
 #  helm install my-app-deployment-chart-1.0.yml -n <namespace>
+
+## For Running All Unit Test Cases
+#  go test ./...
