@@ -11,4 +11,7 @@
 ## For Running All Unit Test Cases
 #  go test ./...
 
+## Create kubernetes service using
+#  kubectl create -f deployment.yml
+
 ## GitHub Actions Configuration
