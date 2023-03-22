@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: go-app-container
-        image: dockerbogo/go-app
+        image: sraynitjsr/go-app
         resources:
           limits:
             memory: "128Mi"
